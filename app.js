@@ -16,9 +16,22 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/api/message', (req, res) => {
   var type = req.param('type');
-	res.status(200);
+  
+  io.on('connection', (socket) => {
+    var addedUser = false;
+  
+    // when the client emits 'new message', this listens and executes
+    socket.on('new message', (data) => {
+      // we tell the client to execute 'new message'
+      socket.broadcast.emit('new message', {
+        username: "Server",
+        message: type
+      });
+      res.status(200);
 	res.send(type);
-	res.end();
+  res.end();
+    });
+  });
 });
 
 // Chatroom
